@@ -1,6 +1,10 @@
 # Support WDS function
 HAS_WDS=n
 
+MODULE_NAME = MT7610u
+KVER  := $(shell uname -r)
+KSRC := /lib/modules/$(KVER)/build
+MODDESTDIR := /lib/modules/$(KVER)/kernel/drivers/net/wireless/
 
 # Support Wpa_Supplicant
 # i.e. wpa_supplicant -Dralink
@@ -368,7 +372,14 @@ all: modules
 
 modules:
 	$(MAKE) ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) -C $(KSRC) M=$(PWD) modules
-
+	
+install:
+	install -p -m 644 $(MODULE_NAME).ko  $(MODDESTDIR)
+	/sbin/depmod -a ${KVER}
+uninstall:
+	rm -f $(MODDESTDIR)/$(MODULE_NAME).ko
+	/sbin/depmod -a ${KVER}
+	
 clean:
 	rm -f */*.o
 	rm -f */.*.{cmd,flags,d}
